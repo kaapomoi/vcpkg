@@ -5,8 +5,9 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO oneapi-src/oneTBB
     REF "v${VERSION}"
-    SHA512 d71cf317e7f78948c1ea20977cfcfba1eff72cb20c457c87e624cb3aaa3215a1c24eeeec11ed6ed99cf118c577d956234202458bb5e0215c9c317099d9c3b732
-    HEAD_REF onetbb_2021
+    SHA512 d87c67514ca17c9769910194a8fac912e183952ad5c408dbceb48edc8aef13375df3d4c9120a7366206c8ab72699ed953df65c11c261e19d8e9d273c73d073f3
+    HEAD_REF master
+    PATCHES
 )
 
 vcpkg_check_features(

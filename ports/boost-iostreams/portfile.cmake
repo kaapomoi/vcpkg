@@ -3,16 +3,17 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO boostorg/iostreams
-    REF boost-1.82.0
-    SHA512 2949f3612cbc809f723a16168ccfb39249ba1e730ec9fa5201a41189bbce22b35e9adeb1478f7cbf012346f67ac7d8841770c8f977711ef0aea0fd6dd01dd785
+    REF boost-${VERSION}
+    SHA512 b209b2302ba2f5f7483e5d7fbc37104738b87e7f9016ee7fba1dbe4962c0594763523693cbb8c9a8d4867a7d486024b1ca7c82cfe646400a5be384136139ce7f
     HEAD_REF master
-    PATCHES Removeseekpos.patch
 )
 
-include(${CURRENT_HOST_INSTALLED_DIR}/share/boost-build/boost-modular-build.cmake)
-boost_modular_build(
-    SOURCE_PATH ${SOURCE_PATH}
-    BOOST_CMAKE_FRAGMENT "${CMAKE_CURRENT_LIST_DIR}/b2-options.cmake"
+set(FEATURE_OPTIONS "")
+include("${CMAKE_CURRENT_LIST_DIR}/features.cmake")
+if (BOOST_IOSTREAMS_ENABLE_ZSTD AND VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    list(APPEND FEATURE_OPTIONS "-DBOOST_IOSTREAMS_ZSTD_TARGET=zstd::libzstd_static")
+endif()
+boost_configure_and_install(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS ${FEATURE_OPTIONS}
 )
-include(${CURRENT_INSTALLED_DIR}/share/boost-vcpkg-helpers/boost-modular-headers.cmake)
-boost_modular_headers(SOURCE_PATH ${SOURCE_PATH})

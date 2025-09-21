@@ -3,7 +3,7 @@ vcpkg_from_github(
     REPO simdjson/simdjson
     REF "v${VERSION}"
     HEAD_REF master
-    SHA512 eeac785c7868362f51f3fb87cb4e0cfc77b2c4e3767afbe1d22df87f16a3cb4af1dc27a1df5ba3c139cb0a3053bc30afcdcb31515ce4e757c309ed2c0f3f507e
+    SHA512 9cb542f8fe934064849e819aa4c059677fc60b83544de376ccd700f1867367bafb0b7ed1d16179deaae360f4036e60adc58af0034f68904cfcd32233a3d099c2
 )
 
 vcpkg_check_features(
@@ -41,4 +41,4 @@ vcpkg_fixup_pkgconfig()
 
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include" "${CURRENT_PACKAGES_DIR}/debug/share")
 
-vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE" "${SOURCE_PATH}/LICENSE-MIT")

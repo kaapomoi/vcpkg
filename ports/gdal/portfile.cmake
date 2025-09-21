@@ -2,14 +2,14 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OSGeo/gdal
     REF "v${VERSION}"
-    SHA512 38d488a5c70f0f4b6a3b99a14c747760574680f1f7fc5c6e4c373e3599a03c3227bb1bdefc14c7770f15b5087ff706362ed5a0fc0f5623835f006561f5db9595
+    SHA512 84a9bd58e9992d2d447788727228410184ef31e881026aee1f48766ed8b25039ab1b09afe95c97b66d3a0751bab524dc9bb57ab2c78af53632b52ec8dcd6f4ad
     HEAD_REF master
     PATCHES
         find-link-libraries.patch
         fix-gdal-target-interfaces.patch
         libkml.patch
-        Fix-quote-variable.patch
-        fix-jpeg.patch
+        sqlite3.diff
+        target-is-valid.patch
 )
 # `vcpkg clean` stumbles over one subdir
 file(REMOVE_RECURSE "${SOURCE_PATH}/autotest")
@@ -23,6 +23,8 @@ vcpkg_replace_string("${SOURCE_PATH}/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base
 # "core" is used for a dependency which must be enabled to avoid vendored lib.
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
+        arrow            GDAL_USE_ARROW
+        archive          GDAL_USE_ARCHIVE
         cfitsio          GDAL_USE_CFITSIO
         curl             GDAL_USE_CURL
         expat            GDAL_USE_EXPAT
@@ -34,6 +36,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         iconv            GDAL_USE_ICONV
         jpeg             GDAL_USE_JPEG
         core             GDAL_USE_JSONC
+        kea              GDAL_USE_KEA
         lerc             GDAL_USE_LERC
         libkml           GDAL_USE_LIBKML
         lzma             GDAL_USE_LIBLZMA
@@ -43,6 +46,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         odbc             GDAL_USE_ODBC
         openjpeg         GDAL_USE_OPENJPEG
         openssl          GDAL_USE_OPENSSL
+        parquet          GDAL_USE_PARQUET
         pcre2            GDAL_USE_PCRE2
         png              GDAL_USE_PNG
         poppler          GDAL_USE_POPPLER
@@ -65,7 +69,7 @@ if(GDAL_USE_ICONV AND VCPKG_TARGET_IS_WINDOWS)
 endif()
 
 # Compatibility with older Android versions https://github.com/OSGeo/gdal/pull/5941
-if(VCPKG_TARGET_IS_ANDROID AND ANRDOID_PLATFORM VERSION_LESS 24 AND (VCPKG_TARGET_ARCHITECTURE STREQUAL "x86" OR VCPKG_TARGET_ARCHITECTURE STREQUAL "arm"))
+if(VCPKG_TARGET_IS_ANDROID AND ANDROID_PLATFORM VERSION_LESS 24 AND (VCPKG_TARGET_ARCHITECTURE STREQUAL "x86" OR VCPKG_TARGET_ARCHITECTURE STREQUAL "arm"))
     list(APPEND FEATURE_OPTIONS -DBUILD_WITHOUT_64BIT_OFFSET=ON)
 endif()
 
@@ -83,11 +87,11 @@ vcpkg_cmake_configure(
         -DCMAKE_DISABLE_FIND_PACKAGE_Java=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_JNI=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_SWIG=ON
-        -DCMAKE_DISABLE_FIND_PACKAGE_Arrow=ON
         -DGDAL_USE_INTERNAL_LIBS=OFF
         -DGDAL_USE_EXTERNAL_LIBS=OFF
         -DGDAL_BUILD_OPTIONAL_DRIVERS=ON
         -DOGR_BUILD_OPTIONAL_DRIVERS=ON
+        -DFIND_PACKAGE2_KEA_ENABLED=OFF
         -DGDAL_CHECK_PACKAGE_MySQL_NAMES=unofficial-libmariadb
         -DGDAL_CHECK_PACKAGE_MySQL_TARGETS=unofficial::libmariadb
         -DMYSQL_LIBRARIES=unofficial::libmariadb
@@ -117,34 +121,34 @@ list(APPEND CMAKE_PROGRAM_PATH \"\${vcpkg_host_prefix}/tools/pkgconf\")"
 if (BUILD_APPS)
     vcpkg_copy_tools(
         TOOL_NAMES
-            gdalinfo
-            gdalbuildvrt
-            gdaladdo
-            gdal_grid
-            gdal_translate
-            gdal_rasterize
-            gdalsrsinfo
-            gdalenhance
-            gdalmanage
-            gdaltransform
-            gdaltindex
-            gdaldem
-            gdal_create
-            gdal_viewshed
-            nearblack
-            ogrlineref
-            ogrtindex
-            gdalwarp
+            gdal
             gdal_contour
+            gdal_create
+            gdal_footprint
+            gdal_grid
+            gdal_rasterize
+            gdal_translate
+            gdal_viewshed
+            gdaladdo
+            gdalbuildvrt
+            gdaldem
+            gdalenhance
+            gdalinfo
             gdallocationinfo
-            ogrinfo
-            ogr2ogr
-            ogrlineref
-            nearblack
+            gdalmanage
             gdalmdiminfo
             gdalmdimtranslate
+            gdalsrsinfo
+            gdaltindex
+            gdaltransform
+            gdalwarp
             gnmanalyse
             gnmmanage
+            nearblack
+            ogr2ogr
+            ogrinfo
+            ogrlineref
+            ogrtindex
             sozip
         AUTO_CLEAN
     )
@@ -169,4 +173,4 @@ vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/cpl_config.h" "#define GDA
 
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/vcpkg-cmake-wrapper.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-file(INSTALL "${SOURCE_PATH}/LICENSE.TXT" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.TXT")

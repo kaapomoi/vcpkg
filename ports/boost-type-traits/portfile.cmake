@@ -3,10 +3,13 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO boostorg/type_traits
-    REF boost-1.82.0
-    SHA512 0ffabde32148936aea8564b45f64c55b4243b2d84f23b615efc6057d43a13da5ff2f8c757b09c1c29a7e2209b3449d2b0eebec370717e52bab9110d6903691e1
+    REF boost-${VERSION}
+    SHA512 49b30e6d98f15b85e900777f3c66378f34050b7951ffe4b05b42ad6a8284bad28a154ec06288ea2b12466936a9ce92bace68111382576f40b9b940c9eb971c1c
     HEAD_REF master
 )
 
-include(${CURRENT_INSTALLED_DIR}/share/boost-vcpkg-helpers/boost-modular-headers.cmake)
-boost_modular_headers(SOURCE_PATH ${SOURCE_PATH})
+set(FEATURE_OPTIONS "")
+boost_configure_and_install(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS ${FEATURE_OPTIONS}
+)

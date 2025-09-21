@@ -3,16 +3,17 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO boostorg/math
-    REF boost-1.82.0
-    SHA512 2788b5cc1ca359544d81c5942465703b11a6c243234adfb4e87a355ebdfdfbd52f99bfab2355b49438bbc0ed4d96d26ac924abd14464519d35099f91bb5129db
+    REF boost-${VERSION}
+    SHA512 a246df993c0201dd61cad821d75486957dc3be804e511f583943d13cdf08a664a3c6b038f354200d398b90eb03c66a9640371bfd115ba4fbd4b6c2502083df67
     HEAD_REF master
-    PATCHES 001-remove-checks.patch
+    PATCHES
+        build-old-libs.patch
+        opt-random.diff
 )
 
-include(${CURRENT_HOST_INSTALLED_DIR}/share/boost-build/boost-modular-build.cmake)
-boost_modular_build(
-    SOURCE_PATH ${SOURCE_PATH}
-    BOOST_CMAKE_FRAGMENT "${CMAKE_CURRENT_LIST_DIR}/b2-options.cmake"
+set(FEATURE_OPTIONS "")
+include("${CMAKE_CURRENT_LIST_DIR}/features.cmake")
+boost_configure_and_install(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS ${FEATURE_OPTIONS}
 )
-include(${CURRENT_INSTALLED_DIR}/share/boost-vcpkg-helpers/boost-modular-headers.cmake)
-boost_modular_headers(SOURCE_PATH ${SOURCE_PATH})

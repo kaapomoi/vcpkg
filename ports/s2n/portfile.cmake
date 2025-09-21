@@ -2,10 +2,10 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO aws/s2n-tls
     REF "v${VERSION}"
-    SHA512 cfdfcdaa9d57427211e896845358da85d7498fa0478b6916dd34f36c755100c0421c07ccd624ed2d4baf9fcfe0dde6629159769619ac22e9ef1535ba20bf8979
+    SHA512 f9c8a8c472ae99939972e0f610411bf696119ec5fff0685093fb9ebd442479703e84e156989e5963e003087b0771a185975fce4398ead5b8ea997888bf766c75 
     PATCHES
         fix-cmake-target-path.patch
-        remove-trycompile.patch
+        openssl.patch
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS

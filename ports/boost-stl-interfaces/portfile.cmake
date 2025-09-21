@@ -3,10 +3,13 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO boostorg/stl_interfaces
-    REF boost-1.82.0
-    SHA512 55307949a54b491ae9d6476c92c1f64c550882b9f0c723111a21afe301731270779c100fc7aecc3fc23f7844e56c2de3b6bb83293624b8032d51619b07d9b768
+    REF boost-${VERSION}
+    SHA512 802d6da2290a3e764ae3278abb8351bd439d592e59fb19c05918555cb6c291b4d5aff45e7859659ee4b9bad04bc4aca8ee4033a10d9e41b420b21563e0f83c37
     HEAD_REF master
 )
 
-include(${CURRENT_INSTALLED_DIR}/share/boost-vcpkg-helpers/boost-modular-headers.cmake)
-boost_modular_headers(SOURCE_PATH ${SOURCE_PATH})
+set(FEATURE_OPTIONS "")
+boost_configure_and_install(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS ${FEATURE_OPTIONS}
+)

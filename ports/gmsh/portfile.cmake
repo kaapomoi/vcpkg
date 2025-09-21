@@ -1,11 +1,15 @@
+string(REPLACE "." "_" UNDERSCORES_VERSION "${VERSION}")
+
 vcpkg_from_gitlab(
     GITLAB_URL https://gitlab.onelab.info
     OUT_SOURCE_PATH SOURCE_PATH
     REPO gmsh/gmsh
-    REF gmsh_4_11_1
-    SHA512 4c10a41659ee4f70ba5091f9ae1c4c3ee285ccf217c3de1157a0d6d694e6f1df9a6b1329b2b24029dd52f945dd7605e477302bdb358106a8d97e903eaba425dc
+    REF "${PORT}_${UNDERSCORES_VERSION}"
+    SHA512 45992b474b9e25aa681474740699dc5601abb1cdcbd4e6d3a0eca14a49cac576e085b3d2ffd11d39eab64aa2452c6a411975afabba668305650ec34b4b0040ff
     HEAD_REF master
-    PATCHES fix-install.patch
+    PATCHES
+        installdirs.diff
+        linking-and-naming.diff
 )
 
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" BUILD_LIB)
@@ -29,6 +33,7 @@ vcpkg_cmake_configure(
         ${FEATURE_OPTIONS}
         -DENABLE_BUILD_LIB=${BUILD_LIB}
         -DENABLE_BUILD_SHARED=${BUILD_SHARED}
+        -DENABLE_OS_SPECIFIC_INSTALL=OFF
         -DENABLE_MSVC_STATIC_RUNTIME=${STATIC_RUNTIME}
         -DGMSH_RELEASE=ON
         -DENABLE_PACKAGE_STRIP=ON
@@ -106,6 +111,12 @@ vcpkg_cmake_install()
 
 vcpkg_copy_tools(TOOL_NAMES gmsh AUTO_CLEAN)
 
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include" "${CURRENT_PACKAGES_DIR}/debug/share")
+vcpkg_cmake_config_fixup()
 
+file(REMOVE_RECURSE
+    "${CURRENT_PACKAGES_DIR}/debug/include"
+    "${CURRENT_PACKAGES_DIR}/debug/share"
+)
+
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.txt")

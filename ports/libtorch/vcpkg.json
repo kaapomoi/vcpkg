@@ -1,14 +1,19 @@
 {
   "name": "libtorch",
-  "version": "1.12.1",
-  "port-version": 3,
+  "version": "2.7.1",
   "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
   "homepage": "https://pytorch.org/",
   "license": null,
   "supports": "(windows & !static) | osx | linux",
   "dependencies": [
+    "blas",
+    "cpp-httplib",
     "cpuinfo",
     "eigen3",
+    {
+      "name": "fbgemm",
+      "platform": "x64"
+    },
     "flatbuffers",
     {
       "name": "flatbuffers",
@@ -16,25 +21,23 @@
     },
     "fmt",
     "foxi",
+    "fp16",
     "gemmlowp",
-    "gflags",
-    "glog",
+    "lapack",
     "lmdb",
-    {
-      "name": "mpi",
-      "platform": "linux"
-    },
+    "mimalloc",
+    "nlohmann-json",
     "onnx",
     "onnx-optimizer",
-    {
-      "name": "openblas",
-      "platform": "windows"
-    },
+    "opencl",
+    "pocketfft",
     "protobuf",
     {
       "name": "protobuf",
       "host": true
     },
+    "pthreadpool",
+    "pybind11",
     "sleef",
     {
       "name": "vcpkg-cmake",
@@ -47,17 +50,58 @@
     {
       "name": "vcpkg-get-python-packages",
       "host": true
-    }
-  ],
-  "default-features": [
+    },
     "xnnpack"
   ],
+  "default-features": [
+    "gflags",
+    "glog",
+    "opencv",
+    "zstd"
+  ],
   "features": {
+    "cuda": {
+      "description": "Build with CUDA GPU backend",
+      "supports": "(windows & x64 & !staticcrt) | (linux & x64)",
+      "dependencies": [
+        "cuda",
+        "cudnn",
+        {
+          "name": "gloo",
+          "features": [
+            "cuda"
+          ],
+          "platform": "linux"
+        },
+        "magma",
+        {
+          "name": "nccl",
+          "platform": "linux"
+        },
+        "nvidia-cutlass",
+        {
+          "name": "tensorpipe",
+          "features": [
+            "cuda"
+          ],
+          "platform": "linux"
+        }
+      ]
+    },
     "dist": {
       "description": "Use distributed with MPI, Gloo, libuv, TensorPipe",
+      "supports": "linux | windows",
       "dependencies": [
         {
           "name": "gloo",
+          "platform": "linux"
+        },
+        {
+          "name": "libtorch",
+          "default-features": false,
+          "features": [
+            "mpi"
+          ],
           "platform": "linux"
         },
         {
@@ -65,20 +109,33 @@
           "platform": "windows | osx"
         },
         {
-          "name": "openmpi",
-          "platform": "linux | osx"
-        },
-        {
           "name": "tensorpipe",
-          "platform": "linux | osx"
+          "platform": "linux"
         }
       ]
     },
-    "leveldb": {
-      "description": "Build with LevelDB",
+    "gflags": {
+      "description": "Build with gflags",
       "dependencies": [
-        "leveldb",
-        "snappy"
+        "gflags"
+      ]
+    },
+    "glog": {
+      "description": "Build with glog",
+      "dependencies": [
+        "glog"
+      ]
+    },
+    "llvm": {
+      "description": "Build with LLVM",
+      "dependencies": [
+        "llvm"
+      ]
+    },
+    "mpi": {
+      "description": "Build with MPI",
+      "dependencies": [
+        "mpi"
       ]
     },
     "nnpack": {
@@ -89,28 +146,21 @@
       ]
     },
     "opencv": {
-      "description": "Build with OpenCV 3.x",
+      "description": "Build with OpenCV",
       "dependencies": [
         "opencv"
       ]
     },
-    "tbb": {
-      "description": "Build with Intel TBB",
-      "dependencies": [
-        "tbb"
-      ]
-    },
     "vulkan": {
       "description": "Build with Vulkan GPU backend",
-      "supports": "!windows",
       "dependencies": [
-        "vulkan"
-      ]
-    },
-    "xnnpack": {
-      "description": "Build with XNNPack",
-      "dependencies": [
-        "xnnpack"
+        {
+          "name": "shaderc",
+          "host": true
+        },
+        "vulkan",
+        "vulkan-loader",
+        "vulkan-memory-allocator"
       ]
     },
     "zstd": {
